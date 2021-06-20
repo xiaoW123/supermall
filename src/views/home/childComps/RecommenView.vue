@@ -2,23 +2,25 @@
   <div class="recommen">
     <div v-for="(item, index) in recommends.list" :key="index" class="recommen-itme">
       <a :href="item.link">
-        <img :src="item.image" alt="">
+        <img :src="item.image" alt=""><br>
         <span>{{item.title}}</span>
       </a>
-      
     </div>
   </div>
 </template>
 
 <script>
 export default {
+  components: {  },
   name: 'RecommenView',
   props: {
     recommends: {
-      type: Array,
+      type: [Array, Object],
       default() {
         return []
-      }
+      },
+      
+      // required: true
     }
   }
 }
@@ -41,8 +43,8 @@ export default {
   }
 
   .recommen img {
-    width: 80px;
-    height: 80px;
+    width: 75%;
+    height: 75%;
     margin-bottom: 10px;
   }
 

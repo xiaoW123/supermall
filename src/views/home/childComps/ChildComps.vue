@@ -17,7 +17,7 @@ export default {
   name: 'ChildComps',
   props:{
     banners:{
-      type: Array,
+      type: [Array, Object],
       default() {
         return []
       }
