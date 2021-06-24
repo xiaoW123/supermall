@@ -1,6 +1,6 @@
 <template>
   <div class="goods-item">
-      <img :src="goodsItem.showLarge.img" alt="">
+      <img :src="goodsItem.showLarge.img" alt="" @load="imageLoad">
       <div class="goods-info">
         <p>{{goodsItem.title}}</p>
         <span class="price">{{goodsItem.price}}</span>
@@ -18,6 +18,13 @@ export default {
       default() {
         return []
       }
+    }
+  },
+  methods: {
+    imageLoad() {
+      // console.log('---')
+      // this.$refs.Scroll.scroll.refresh() 拿不到scroll
+      this.$bus.$emit('itemImageLoad')
     }
   }
 }

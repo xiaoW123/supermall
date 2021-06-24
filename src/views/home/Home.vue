@@ -1,55 +1,34 @@
 <template>
   <div id="home">
     <nav-bar class="nav-bar"><div slot="center">购物车</div></nav-bar>
-    <!-- 轮播图组件 -->
-    <child-comps :banners="banners"/>
 
-    <!-- 活动福利组件 -->
-    <recommen-view :recommends="recommends"/>
+    <scroll ref="Scroll" @scroll='contentScroll' @pullingUp='loadMore' :pullUpLoad='true'><!-- 滚动效果 -->
+      <!-- 轮播图组件 -->
+      <child-comps :banners="banners" />
 
-    <!-- 排行榜组件  -->
-    <feature-view />
+      <!-- 活动福利组件 -->
+      <recommen-view :recommends="recommends" />
 
-    <!-- 流行、新款、精选 -->
-    <tab-control
-      class="tab-control"
-      :titles="['流行', '新款', '精选']"
-      @tabClick="tabClick"
-    />
-    <goods-list :goods="goods[currentType]" />
+      <!-- 排行榜组件  -->
+      <feature-view />
+
+      <!-- 流行、新款、精选 -->
+      <tab-control
+        class="tab-control"
+        :titles="['流行', '新款', '精选']"
+        @tabClick="tabClick"/>
+        
+      <goods-list :goods="goods[currentType]" />
+    </scroll>
+
+
+    <!-- 回到顶部 -->
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
+
 
     <h2>22222</h2>
     <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
-    <h2>22222</h2>
+
   </div>
 </template>
 
@@ -65,6 +44,10 @@ import RecommenView from "./childComps/RecommenView.vue";
 import FeatureView from "./childComps/FeatureView.vue";
 import TabControl from "components/content/tabControl/TabControl.vue";
 import GoodsList from "components/content/goods/GoodsList.vue";
+import Scroll from "components/common/scroll/Scroll.vue";
+import BackTop from 'components/content/backtop/BackTop.vue';
+
+
 
 export default {
   name: "Home",
@@ -75,6 +58,8 @@ export default {
     FeatureView,
     TabControl,
     GoodsList,
+    Scroll,
+    BackTop,
   },
   data() {
     return {
@@ -86,16 +71,25 @@ export default {
         sell: { page: 0, list: [] },
       },
       currentType: "pop",
+      isShowBackTop: false,
     };
   },
+
   created() {
     this.getHomeMutidata();
 
     this.getProductData("pop");
     this.getProductData("new");
     this.getProductData("sell");
+
+    this.$bus.$on('itemImageLoad', () => {
+      // console.log('------')
+      this.$refs.Scroll.scroll.refresh()
+    })
   },
+
   methods: {
+    //根据点击获取 流行、精选、新款的数据
     tabClick(index) {
       switch (index) {
         case 0:
@@ -110,7 +104,19 @@ export default {
       }
       console.log(index);
     },
+    //回到顶部使用 ref访问scroll子组件的scrollTo方法回到顶部
+    backClick() {
+      this.$refs.Scroll.scrollTo(0, 0)
+    },
+    contentScroll(position) {
+      this.isShowBackTop = (-position.y) > 1000 
+    },
 
+    loadMore() {
+      // console.log('上拉加载')
+      this.getProductData(this.currentType)
+      this.$refs.Scroll.refresh() //重新计算可滚动区域，解除不能滚动的bug
+    },
     /*
      *网络请求
      */
@@ -134,12 +140,14 @@ export default {
       });
     },
   },
+
 };
 </script>
 
 <style scoped>
 #home {
-  padding-top: 44px;
+  height: 100vh;
+  padding-top: 44px;  /* 100视口 */
 }
 
 .nav-bar {
