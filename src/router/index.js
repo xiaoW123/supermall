@@ -9,6 +9,7 @@ const Category = () => import('views/category/Category.vue')
 const Cart = () => import('views/cart/Cart.vue')
 const Profile = () => import('views/profile/Profile.vue')
 const Detail = () => import('views/detail/Detail.vue')
+
 //创建router
 const router = new VueRouter({
   routes:[
@@ -33,7 +34,7 @@ const router = new VueRouter({
       component: Profile
     },
     {
-      path: '/detail',
+      path: '/detail/:iid',
       component: Detail
     }
   ],

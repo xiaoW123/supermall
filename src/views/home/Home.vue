@@ -1,10 +1,21 @@
 <template>
   <div id="home">
     <nav-bar class="nav-bar"><div slot="center">购物车</div></nav-bar>
+    <tab-control
+        class="tab-control"
+        :titles="['流行', '新款', '精选']"
+        @tabClick="tabClick"
+        ref="TabControl1" 
+        v-show="isTabFiexed"/>
 
-    <scroll ref="Scroll" @scroll='contentScroll' @pullingUp='loadMore' :pullUpLoad='true'><!-- 滚动效果 -->
+    <scroll
+      ref="Scroll"
+      @scroll="contentScroll"
+      @pullingUp="loadMore"
+      :pullUpLoad="true"
+      ><!-- 滚动效果 -->
       <!-- 轮播图组件 -->
-      <child-comps :banners="banners" />
+      <child-comps :banners="banners" @swiperLmageLoad="swiperLmageLoad"/>
 
       <!-- 活动福利组件 -->
       <recommen-view :recommends="recommends" />
@@ -14,21 +25,18 @@
 
       <!-- 流行、新款、精选 -->
       <tab-control
-        class="tab-control"
         :titles="['流行', '新款', '精选']"
-        @tabClick="tabClick"/>
-        
+        @tabClick="tabClick"
+        ref="TabControl2" v-show="!isTabFiexed"/>
+
       <goods-list :goods="goods[currentType]" />
     </scroll>
-
 
     <!-- 回到顶部 -->
     <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
 
-
     <h2>22222</h2>
     <h2>22222</h2>
-
   </div>
 </template>
 
@@ -72,6 +80,9 @@ export default {
       },
       currentType: "pop",
       isShowBackTop: false,
+      tabOffsetTop: 0,
+      isTabFiexed: false,
+      saveY: 0
     };
   },
 
@@ -86,8 +97,19 @@ export default {
       // console.log('------')
       this.$refs.Scroll.scroll.refresh()
     })
+    
   },
+  mounted(){
+    // console.log(this.$refs.TabControl.$el.offsetTop)
 
+  },
+  activated() {
+    this.$refs.Scroll.scrollTo(0, this.saveY, 0)
+    this.$refs.Scroll.refresh()
+  },
+  deactivated() {
+    this.saveY = this.$refs.Scroll.scroll.y //保存处于活跃状态时的滚动高度
+  },
   methods: {
     //根据点击获取 流行、精选、新款的数据
     tabClick(index) {
@@ -102,6 +124,9 @@ export default {
           this.currentType = "sell";
           break;
       }
+      this.$refs.TabControl1.currentIndex = index
+      this.$refs.TabControl2.currentIndex = index
+
       console.log(index);
     },
     //回到顶部使用 ref访问scroll子组件的scrollTo方法回到顶部
@@ -110,12 +135,19 @@ export default {
     },
     contentScroll(position) {
       this.isShowBackTop = (-position.y) > 1000 
+      this.isTabFiexed = (-position.y) > this.tabOffsetTop
     },
 
     loadMore() {
       // console.log('上拉加载')
       this.getProductData(this.currentType)
       this.$refs.Scroll.refresh() //重新计算可滚动区域，解除不能滚动的bug
+    },
+
+    swiperLmageLoad() {
+      // console.log('------')
+      this.tabOffsetTop = this.$refs.TabControl2.$el.offsetTop
+      // console.log(this.tabOffsetTop)
     },
     /*
      *网络请求
@@ -137,6 +169,7 @@ export default {
         // console.log(res.data.data.list)
         this.goods[type].page += 1;
         this.goods[type].list.push(...res.data.data.list);
+        this.$refs.Scroll.finishPullUp()
       });
     },
   },
@@ -147,25 +180,29 @@ export default {
 <style scoped>
 #home {
   height: 100vh;
-  padding-top: 44px;  /* 100视口 */
+  /* padding-top: 44px; 100视口 */
 }
 
 .nav-bar {
-  position: fixed;
+  /* position: fixed;
   left: 0;
   right: 0;
   top: 0;
-  z-index: 5;
+  z-index: 5; */
 
   background-color: var(--color-tint);
   text-align: center;
   color: var(--color-background);
 }
-
-.tab-control {
-  /* 粘性定位不兼容IE */
+/* 粘性定位不兼容IE */
+/* .tab-control {
   position: sticky;
   z-index: 9;
   top: 44px;
+} */
+.tab-control {
+   position: relative;
+    z-index: 9;
 }
+
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="goods-item">
-      <img :src="goodsItem.showLarge.img" alt="" @load="imageLoad">
+      <img :src="goodsItem.showLarge.img" alt="" @load="imageLoad" @click="itemClick">
       <div class="goods-info">
         <p>{{goodsItem.title}}</p>
         <span class="price">{{goodsItem.price}}</span>
@@ -25,6 +25,10 @@ export default {
       // console.log('---')
       // this.$refs.Scroll.scroll.refresh() 拿不到scroll
       this.$bus.$emit('itemImageLoad')
+    },
+    itemClick() {
+      // console.log('跳转到详情页')
+      this.$router.push('/detail/' + this.goodsItem.iid)
     }
   }
 }

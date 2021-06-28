@@ -13,6 +13,5 @@ export function _getProductData(type, page) {
       type: type,
       page: page
     }
-    
   })
 }
