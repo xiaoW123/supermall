@@ -1,6 +1,6 @@
 <template>
   <div id="home">
-    <nav-bar class="nav-bar"><div slot="center">购物车</div></nav-bar>
+    <nav-bar class="nav-bar"><div slot="center">购物街</div></nav-bar>
     <tab-control
         class="tab-control"
         :titles="['流行', '新款', '精选']"
@@ -95,7 +95,7 @@ export default {
 
     this.$bus.$on('itemImageLoad', () => {
       // console.log('------')
-      this.$refs.Scroll.scroll.refresh()
+      this.$refs.Scroll.refresh()
     })
     
   },
@@ -104,10 +104,12 @@ export default {
 
   },
   activated() {
+    //保存纪录
     this.$refs.Scroll.scrollTo(0, this.saveY, 0)
     this.$refs.Scroll.refresh()
   },
   deactivated() {
+    // 保存纪录
     this.saveY = this.$refs.Scroll.scroll.y //保存处于活跃状态时的滚动高度
   },
   methods: {
@@ -173,7 +175,6 @@ export default {
       });
     },
   },
-
 };
 </script>
 
@@ -181,6 +182,7 @@ export default {
 #home {
   height: 100vh;
   /* padding-top: 44px; 100视口 */
+  overflow: hidden;
 }
 
 .nav-bar {

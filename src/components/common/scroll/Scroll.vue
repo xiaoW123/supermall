@@ -66,7 +66,8 @@ export default {
 
 <style scoped>
   .wrapper {
-    height: calc(100% - 49px);
+    height: calc(100% - 44px);
+    /* height: 100%; */
     overflow: hidden;
   }
 </style>
